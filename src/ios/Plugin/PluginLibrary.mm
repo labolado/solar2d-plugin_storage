@@ -25,7 +25,7 @@ class PluginLibrary
 		PluginLibrary();
 
 	public:
-		bool Initialize( CoronaLuaRef listener );
+		void SetListener( CoronaLuaRef listener );
 
 	public:
 		CoronaLuaRef GetListener() const { return fListener; }
@@ -41,10 +41,10 @@ class PluginLibrary
 
 	public:
 		static int check( lua_State *L );
-    
+
     private:
         static uint64_t getFreeDiskspace( lua_State *L );
-    
+
 	private:
 		CoronaLuaRef fListener;
 };
@@ -62,18 +62,10 @@ PluginLibrary::PluginLibrary()
 {
 }
 
-bool
-PluginLibrary::Initialize( CoronaLuaRef listener )
+void
+PluginLibrary::SetListener( CoronaLuaRef listener )
 {
-	// Can only initialize listener once
-	bool result = ( NULL == fListener );
-
-	if ( result )
-	{
-		fListener = listener;
-	}
-
-	return result;
+    fListener = listener;
 }
 
 int
@@ -131,9 +123,9 @@ PluginLibrary::check( lua_State *L )
 		Self *library = ToLibrary( L );
 
 		CoronaLuaRef listener = CoronaLuaNewRef( L, listenerIndex );
-		library->Initialize( listener );
+		library->SetListener( listener );
 	}
-    
+
     Self *library = ToLibrary( L );
     CoronaLuaNewEvent( L, kEvent );
 
@@ -162,7 +154,7 @@ PluginLibrary::getFreeDiskspace( lua_State *L ) {
     } else {
         NSLog(@"Error Obtaining System Memory Info: Domain = %@, Code = %ld", [error domain], (long)[error code]);
     }
-    
+
     lua_pushnumber(L, (totalSpace/1024ll)/1024ll);
     lua_setfield( L, -2, "totalSpace" );
     lua_pushnumber(L, (totalFreeSpace/1024ll)/1024ll);
