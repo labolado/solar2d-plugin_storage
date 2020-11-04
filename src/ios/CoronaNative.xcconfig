@@ -1,0 +1,18 @@
+// This file contains basic setup for Corona Native apps and plugins
+
+CORONA_ROOT=$HOME/Library/Application Support/Corona/Native
+
+HEADER_SEARCH_PATHS = $(inherited) "$(CORONA_ROOT)/Corona/shared/include/Corona" "$(CORONA_ROOT)/Corona/shared/include/lua" "$(CORONA_ROOT)/Corona/ios/include/Corona"
+
+LIBRARY_SEARCH_PATHS = $(inherited) "$(CORONA_ROOT)/Corona/ios/lib"
+
+FRAMEWORK_SEARCH_PATHS = $(inherited) "$(CORONA_ROOT)/Corona/ios/lib" "$(PROJECT_DIR)/EmbeddedFrameworks"
+
+ENABLE_BITCODE = no
+
+// Sometimes passing -all_load flag is not an option. In this case, manually load all libraries with -force_load:
+//CORONA_FORCE_LOAD = --force-load
+//CORONA_CUSTOM_LDFLAGS = -force_load "$(BUILT_PRODUCTS_DIR)/libplugin_storage.a"
+
+//EXCLUDED_ARCHS__EFFECTIVE_PLATFORM_SUFFIX_simulator__NATIVE_ARCH_64_BIT_x86_64=arm64 arm64e armv7 armv7s armv6 armv8
+//EXCLUDED_ARCHS = $(inherited) $(EXCLUDED_ARCHS__EFFECTIVE_PLATFORM_SUFFIX_$(EFFECTIVE_PLATFORM_SUFFIX)__NATIVE_ARCH_64_BIT_$(NATIVE_ARCH_64_BIT))
