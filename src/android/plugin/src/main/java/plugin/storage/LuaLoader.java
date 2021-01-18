@@ -9,6 +9,7 @@
 // e.g. [Lua] require "plugin.library"
 package plugin.storage;
 
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
@@ -168,19 +169,33 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 				CoronaLua.newEvent( L, EVENT_NAME );
 
-				L.pushNumber(getTotalInternalMemorySize());
-				L.setField(-2, "totalSpace");
-				L.pushNumber(getAvailableInternalMemorySize());
-				L.setField(-2, "freeSpace");
-				L.pushNumber(getTotalExternalMemorySize());
-				L.setField(-2, "externalTotalSpace");
-				L.pushNumber(getAvailableExternalMemorySize());
-				L.setField(-2, "externalFreeSpace");
+				try {
+					L.pushNumber(getTotalInternalMemorySize());
+					L.setField(-2, "totalSpace");
+					L.pushNumber(getAvailableInternalMemorySize());
+					L.setField(-2, "freeSpace");
+					L.pushNumber(getTotalExternalMemorySize());
+					L.setField(-2, "externalTotalSpace");
+					L.pushNumber(getAvailableExternalMemorySize());
+					L.setField(-2, "externalFreeSpace");
+				} catch (Exception e) {
+					Log.e("Corona plugin.storage", "Get space error " + e.getMessage());
+					e.printStackTrace();
+					L.pushNumber(20200);
+					L.setField(-2, "totalSpace");
+					L.pushNumber(20200);
+					L.setField(-2, "freeSpace");
+					L.pushNumber(20200);
+					L.setField(-2, "externalTotalSpace");
+					L.pushNumber(20200);
+					L.setField(-2, "externalFreeSpace");
+				}
 
 				try {
 					CoronaLua.dispatchEvent( L, fListener, 0 );
 				} catch (Exception e) {
 					Log.e("Corona plugin.storage", "DispatchEvent error " + e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		} );
@@ -198,8 +213,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 //		File path = Environment.getDownloadCacheDirectory();
 //		File path = Environment.getRootDirectory();
 		StatFs stat = new StatFs(path.getAbsolutePath());
-		long blockSize = stat.getBlockSizeLong();
-		long availableBlocks = stat.getAvailableBlocksLong();
+		long blockSize;
+		long availableBlocks;
+		if (Build.VERSION.SDK_INT < 18) {
+			blockSize = stat.getBlockSize();
+			availableBlocks = stat.getAvailableBlocks();
+		} else {
+			blockSize = stat.getBlockSizeLong();
+			availableBlocks = stat.getAvailableBlocksLong();
+		}
 		return formatSize(availableBlocks * blockSize);
 	}
 
@@ -208,8 +230,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 //		File path = Environment.getDownloadCacheDirectory();
 //		File path = Environment.getRootDirectory();
 		StatFs stat = new StatFs(path.getAbsolutePath());
-		long blockSize = stat.getBlockSizeLong();
-		long totalBlocks = stat.getBlockCountLong();
+		long blockSize;
+		long totalBlocks;
+		if (Build.VERSION.SDK_INT < 18) {
+			blockSize = stat.getBlockSize();
+			totalBlocks = stat.getBlockCount();
+		} else {
+			blockSize = stat.getBlockSizeLong();
+			totalBlocks = stat.getBlockCountLong();
+		}
 		return formatSize(totalBlocks * blockSize);
 	}
 
@@ -217,8 +246,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		if (externalMemoryAvailable()) {
 			File path = Environment.getExternalStorageDirectory();
 			StatFs stat = new StatFs(path.getPath());
-			long blockSize = stat.getBlockSizeLong();
-			long availableBlocks = stat.getAvailableBlocksLong();
+			long blockSize;
+			long availableBlocks;
+			if (Build.VERSION.SDK_INT < 18) {
+				blockSize = stat.getBlockSize();
+				availableBlocks = stat.getAvailableBlocks();
+			} else {
+				blockSize = stat.getBlockSizeLong();
+				availableBlocks = stat.getAvailableBlocksLong();
+			}
 			return formatSize(availableBlocks * blockSize);
 		} else {
 			return 0;
@@ -229,8 +265,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		if (externalMemoryAvailable()) {
 			File path = Environment.getExternalStorageDirectory();
 			StatFs stat = new StatFs(path.getPath());
-			long blockSize = stat.getBlockSizeLong();
-			long totalBlocks = stat.getBlockCountLong();
+			long blockSize;
+			long totalBlocks;
+			if (Build.VERSION.SDK_INT < 18) {
+				blockSize = stat.getBlockSize();
+				totalBlocks = stat.getBlockCount();
+			} else {
+				blockSize = stat.getBlockSizeLong();
+				totalBlocks = stat.getBlockCountLong();
+			}
 			return formatSize(totalBlocks * blockSize);
 		} else {
 			return 0;
