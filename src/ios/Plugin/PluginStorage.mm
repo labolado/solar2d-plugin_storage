@@ -1,28 +1,28 @@
 //
-//  PluginLibrary.mm
+//  PluginStorage.mm
 //  TemplateApp
 //
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "PluginLibrary.h"
+#import "PluginStorage.h"
 
 #include <CoronaRuntime.h>
 #import <UIKit/UIKit.h>
 
 // ----------------------------------------------------------------------------
 
-class PluginLibrary
+class PluginStorage
 {
 	public:
-		typedef PluginLibrary Self;
+		typedef PluginStorage Self;
 
 	public:
 		static const char kName[];
 		static const char kEvent[];
 
 	protected:
-		PluginLibrary();
+		PluginStorage();
 
 	public:
 		void SetListener( CoronaLuaRef listener );
@@ -52,24 +52,24 @@ class PluginLibrary
 // ----------------------------------------------------------------------------
 
 // This corresponds to the name of the library, e.g. [Lua] require "plugin.library"
-const char PluginLibrary::kName[] = "plugin.storage";
+const char PluginStorage::kName[] = "plugin.storage";
 
 // This corresponds to the event name, e.g. [Lua] event.name
-const char PluginLibrary::kEvent[] = "storageStatus";
+const char PluginStorage::kEvent[] = "storageStatus";
 
-PluginLibrary::PluginLibrary()
+PluginStorage::PluginStorage()
 :	fListener( NULL )
 {
 }
 
 void
-PluginLibrary::SetListener( CoronaLuaRef listener )
+PluginStorage::SetListener( CoronaLuaRef listener )
 {
     fListener = listener;
 }
 
 int
-PluginLibrary::Open( lua_State *L )
+PluginStorage::Open( lua_State *L )
 {
 	// Register __gc callback
 	const char kMetatableName[] = __FILE__; // Globally unique string to prevent collision
@@ -93,7 +93,7 @@ PluginLibrary::Open( lua_State *L )
 }
 
 int
-PluginLibrary::Finalizer( lua_State *L )
+PluginStorage::Finalizer( lua_State *L )
 {
 	Self *library = (Self *)CoronaLuaToUserdata( L, 1 );
 
@@ -104,8 +104,8 @@ PluginLibrary::Finalizer( lua_State *L )
 	return 0;
 }
 
-PluginLibrary *
-PluginLibrary::ToLibrary( lua_State *L )
+PluginStorage *
+PluginStorage::ToLibrary( lua_State *L )
 {
 	// library is pushed as part of the closure
 	Self *library = (Self *)CoronaLuaToUserdata( L, lua_upvalueindex( 1 ) );
@@ -114,7 +114,7 @@ PluginLibrary::ToLibrary( lua_State *L )
 
 // [Lua] library.init( listener )
 int
-PluginLibrary::check( lua_State *L )
+PluginStorage::check( lua_State *L )
 {
 	int listenerIndex = 1;
 
@@ -138,7 +138,7 @@ PluginLibrary::check( lua_State *L )
 }
 
 uint64_t
-PluginLibrary::getFreeDiskspace( lua_State *L ) {
+PluginStorage::getFreeDiskspace( lua_State *L ) {
     uint64_t totalSpace = 0;
     uint64_t totalFreeSpace = 0;
     NSError *error = nil;
@@ -168,5 +168,5 @@ PluginLibrary::getFreeDiskspace( lua_State *L ) {
 
 CORONA_EXPORT int luaopen_plugin_storage( lua_State *L )
 {
-	return PluginLibrary::Open( L );
+	return PluginStorage::Open( L );
 }
